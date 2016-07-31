@@ -1,0 +1,1 @@
+var ttt = 'start point';
