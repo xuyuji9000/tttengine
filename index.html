@@ -21,6 +21,7 @@
   'stage': null,
   'stage1': null,
   'end': false,
+  'start': false,
   'play': [],
   'delay':200,
   'x': {
@@ -293,7 +294,7 @@ function move(i) {
 		var rtn = [];
 		if(checkMove(i))
 		{
-			checkMove(i);
+			// checkMove(i);
 			// setTimeout(function(){
 				board.stage.children[i-1].dispatchEvent('mousedown');
 			// }, board.delay);
@@ -321,6 +322,18 @@ function checkMove(i) {
 	return flag;
 }
 
+function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+}
+
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 function getWinner() {
 	if(board.end)
 		return board.winner;
@@ -328,11 +341,26 @@ function getWinner() {
 		return false;
 }
 
+function isEnd() {
+	if(board.end)
+		return true;
+	else
+		return false;
+}
+
 window.onload = function() {
+
 	init();
 
-	// chooseRole('x');
-	// console.log(move(2));console.log(move(3));
+	chooseRole('x');
+	while(!isEnd())
+	{
+	// 	setInterval(function(){
+			var i = Math.floor(Math.random()*9)+1;
+			move(i);
+	// 	}, board.delay)
+		
+	}
 }
 </script>
 </html>
