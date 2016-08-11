@@ -93,8 +93,9 @@
   },
 };
 
+// opposite player
 function notPlayer(player) {
-  return player !== 'x' ? 'o' : 'x';
+  return player !== 'o' ? 'o' : 'x';
 }
 
 function handlePress(id, event) {
@@ -178,12 +179,17 @@ function score(play, player) {
   count(play.b, counts);
   count(play.c, counts);
   
+  // this winning case not gonna work
   if(counts.total === 3) {
     return -1;
   }
+
+  // stop the opposite from winning
   if(counts[notPlayer(player)] == 2) {
     return 7;
   }
+
+  // winning position
   if(counts[player] == 2) {
     return 6;
   }
