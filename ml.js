@@ -1,9 +1,8 @@
-
 var ml = {
 	"updateConstant": 0.4,
 	"hypothesis": [0.5,0.5,0.5,0.5,0.5,0.5],
 	chooseMove: function() {
-
+		
 	},
 	getTrainingExamples: function(history){
 

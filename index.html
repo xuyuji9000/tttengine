@@ -5,12 +5,21 @@
 	<title>Document</title>
 </head>
 <body> 
-
-<!-- <input type="radio" name="radio" id="radio1" class="radio"/>
-<label for="radio1">Third Option</label>
-<input type="radio" name="radio" id="radio2" class="radio"/>
-<label for="radio2">Third Option</label> -->
-
+<div>
+	<div style="display: inline;">
+		<input type="radio" name="radio" id="radio1" class="radio"/>
+		<label for="radio1">AI</label>
+		<input type="radio" name="radio" id="radio2" class="radio" onclick=""/>
+		<label for="radio2">Train Machine Learning</label>
+	</div>
+	<div style="display:inline; margin-left:100px;">
+		<span><span>x win:</span> <span class="xwin">0</span></span>
+		<span><span>o win:</span> <span class="owin">0</span></span>
+		<span><span>tie:</span> <span class="tie">0</span></span>
+	</div>
+</div>
+	
+	
 <canvas id="player" width="500" height="100"></canvas>
 <canvas id="demoCanvas" width="500" height="500"></canvas>
 </body>
@@ -22,7 +31,7 @@
 
 function chooseYourRole() {
 	// ***Demo Start***
-	board.chooseRole('x');
+	board.chooseRole('o');
 	// ***Demo End***
 }
 
