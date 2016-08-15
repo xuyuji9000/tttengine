@@ -6,17 +6,31 @@
 </head>
 <body> 
 <div>
+<form id="myform" action="" onchange="jump()">
 	<div style="display: inline;">
-		<input type="radio" name="radio" id="radio1" class="radio"/>
-		<label for="radio1">AI</label>
-		<input type="radio" name="radio" id="radio2" class="radio" onclick=""/>
-		<label for="radio2">Train Machine Learning</label>
+		<label for="botai">Bot AI:</label>
+		<select name="botai" id="botai">
+			<option value="1">random</option>
+			<option value="2">heuristic</option>
+		</select>
 	</div>
-	<div style="display:inline; margin-left:100px;">
+	<div style="display: inline;">
+		<label for="type">Compete Type:</label>
+		<select name="type" id="type">
+			<option value="1">random</option>
+			<option value="2">machine learning - train</option>
+			<option value="3">machine learning - compete</option>
+		</select>
+	</div>
+	<br>
+	<div>
 		<span><span>x win:</span> <span class="xwin">0</span></span>
 		<span><span>o win:</span> <span class="owin">0</span></span>
 		<span><span>tie:</span> <span class="tie">0</span></span>
 	</div>
+	<br>
+</form>
+	
 </div>
 	
 	
@@ -26,6 +40,62 @@
 <script src="js/createjs-2015.11.26.min.js"></script>
 <script src="js/tweenjs-0.6.2.min.js"></script>
 <script src="ttt.js"></script>
+<script>
+	function jump() {
+		var kvpairs = [];
+		var frm = document.getElementById('myform');
+		for(var i=0; i< frm.elements.length; i++)
+		{
+			var	ele = frm.elements[i];
+			kvpairs.push(encodeURIComponent(ele.name)+"="+encodeURIComponent(ele.value));
+		}
+		var	queryString = kvpairs.join("&");
+		console.log(window.location.origin+"?"+queryString);
+		window.location.href = "?"+queryString;			
+	}
+
+	// get url parameters
+    function getQueryString() {
+	    // This function is anonymous, is executed immediately and 
+	    // the return value is assigned to QueryString!
+	    var query_string = {};
+	    var query = window.location.search.substring(1);
+	    var vars = query.split("&");
+	    for (var i=0;i<vars.length;i++) {
+	      var pair = vars[i].split("=");
+	          // If first entry with this name
+	      if (typeof query_string[pair[0]] === "undefined") {
+	        query_string[pair[0]] = decodeURIComponent(pair[1]);
+	          // If second entry with this name
+	      } else if (typeof query_string[pair[0]] === "string") {
+	        var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
+	        query_string[pair[0]] = arr;
+	          // If third or later entry with this name
+	      } else {
+	        query_string[pair[0]].push(decodeURIComponent(pair[1]));
+	      }
+	    } 
+	    return query_string;
+  	}
+
+  	(function() {
+  		// init form setting
+		var query_string = getQueryString();
+		if(query_string.botai) {
+			var elements = document.forms[0].elements;
+			for (var i = 0; i < elements.length; i++) {
+				switch(elements[i].name) {
+					case "botai":
+						elements[i].value = query_string.botai;
+					break;
+					case "type":
+						elements[i].value = query_string.type;
+					break;
+				}
+			}
+		}
+  	})();
+</script>
 <script>
 
 

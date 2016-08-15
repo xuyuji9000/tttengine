@@ -247,7 +247,7 @@ var board = {
   'end': false,
   'start': false,
   'play': [],
-  'delay':10,
+  'delay':20,
   'currPlayer': 'x',
   'selectedPlayer': null,
   'x': {
@@ -260,8 +260,9 @@ var board = {
     size: 100,
     color: "DeepSkyBlue"
   },
-  "ml_loop": 10,
-  'type': 1, // 1 common, 2 machine learning, 
+  "ml_loop": 100,
+  'type': 1, // 1 common, 2 machine learning training, 3 ml competing
+  "botai": 1, // 1-random, 2- heuristic
   "winner":"",
   'winners': [
     // rows
@@ -309,8 +310,11 @@ var board = {
     // get parameter
     var query_string = board.getQueryString();
     if(query_string.type) {
-      board.type = parseInt(query_string.type); // 1-common, 2- machine learning, 
+      board.type = parseInt(query_string.type); 
+      board.botai = parseInt(query_string.botai); 
     }
+
+
 
   	// init player
   	board.stage1 = new createjs.Stage("player");
@@ -398,7 +402,13 @@ var board = {
   botTurn: function() {
     var player = oppositPlayer(board.selectedPlayer);
     if(player==board.currPlayer) {
-      var pos = board.selectNextPos(player);
+      if(1 == board.botai) // 1 random
+        var pos = board.selectRandomPos(player);
+      else { // 2 heuristic
+        var pos = board.selectNextPos(player);        
+      }
+      // console.log(board.getStatus());
+      console.log("next pos" + pos);
       board[pos].player = player;
       board.recordHistory();
       drawPlayer(board.stage, board[pos].x, board[pos].y, player);
@@ -419,6 +429,18 @@ var board = {
     if (!board[top.a].player) return top.a;
     if (!board[top.c].player) return top.c;
     throw 'not supposed to happen';
+  },
+  selectRandomPos: function() {
+    var flag = true;
+    var index = 0;
+    while(flag)
+    {
+      index = Math.floor(Math.random()*9)+1;
+      var status = board.getStatus();
+      if("-" == status[index-1])
+        flag = false;
+    }
+    return index;
   },
   // use cookie record board history
   recordHistory:function() {
@@ -494,7 +516,7 @@ var board = {
   getSuccessors: function(){
     var status = board.getStatus();
     var successor = new Array();
-    for(var i = 0; i<8; i++)
+    for(var i = 0; i<=8; i++)
     {
       var temp = status;
       if('-' == temp[i])
@@ -595,7 +617,7 @@ function checkEndCondition() {
 
   if(board.end) {
   	clearInterval(board.interval);
-    if(2 == board.type && board.ml_loop >1) // if machine learning && still got loop number
+    if(3 == board.type && board.ml_loop >1) // if machine learning && still got loop number
     {
       board.ml_loop--;
       reset();
@@ -713,7 +735,8 @@ function chooseMachineMove() {
       bestSuccessor = element;
     }
   });
-
+  console.log(board.getStatus());
+  console.log("machine move "+bestSuccessor[0]);
   move(bestSuccessor[0]);
 }
 
