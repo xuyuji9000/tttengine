@@ -1,5 +1,5 @@
 var ml = {
-  "updateConstant": 0.4,
+  "updateConstant": 0.1,
   "hypothesis": [0.5,0.5,0.5,0.5,0.5,0.5, 0.5],
   'winners': [
     // rows
@@ -48,7 +48,7 @@ var ml = {
     // check win sitution
     for (var i = 0; i < ml.winners.length; i++) {
       var win = ml.winners[i];
-      if (currentBoard[win.a-1] === currentBoard[win.b-1] && currentBoard[win.b-1] === currentBoard[win.c-1]) {
+      if ('-' != currentBoard[win.a-1] &&currentBoard[win.a-1] === currentBoard[win.b-1] && currentBoard[win.b-1] === currentBoard[win.c-1]) {
         end = true;
       }
     }
@@ -68,20 +68,24 @@ var ml = {
     return end;
   },
   getTrainingExamples: function(history) {
-    var mockPlayer = 'x'; // mock this is the selected player
+    console.log(history);
+    // var mockPlayer = 'o'; // mock this is the selected player
     var trainingExamples = new Array();
     for(var i = 0; i < history.length; i++) {
       if(ml.checkEnd(history[i])) { // if end
-        if(ml.getWinner(history[i]) == mockPlayer) {
+        if(ml.getWinner(history[i]) == board.selectedPlayer) {
           trainingExamples.push(new Array(ml.getFeatures(history[i]), 100));
         } else if(false == ml.getWinner(history[i])) {
           trainingExamples.push(new Array(ml.getFeatures(history[i]), 0));
         } else {
+          console.log("ml.getFeatures(history[i]) "+ml.getFeatures(history[i]));
+          console.log("ml.getWinner(history[i])" + ml.getWinner(history[i]));
+          console.log("board.selectedPlayer" + board.selectedPlayer);
           trainingExamples.push(new Array(ml.getFeatures(history[i]), -100));
         }
       } else { // not end
-        if(i+2 >= (history.length-1)) {
-          if(false == ml.getWinner(history[(history.length-1)-1])) {
+        if(i+2 >= (history.length)) {
+          if(false == ml.getWinner(history[(history.length-1)])) {
             trainingExamples.push(new Array(ml.getFeatures(history[i]), 0));
           } else {
             trainingExamples.push(new Array(ml.getFeatures(history[i]), -100));
@@ -110,8 +114,8 @@ var ml = {
     // check win sitution
     for (var i = 0; i < ml.winners.length; i++) {
       var win = ml.winners[i];
-      if (currentBoard[win.a-1] === currentBoard[win.b-1] && currentBoard[win.b-1] === currentBoard[win.c-1]) {
-        winner = win[win.a-1];
+      if ('-' != currentBoard[win.a-1]&&currentBoard[win.a-1] === currentBoard[win.b-1] && currentBoard[win.b-1] === currentBoard[win.c-1]) {
+        winner = currentBoard[win.a-1];
         break;
       }
     }
@@ -213,14 +217,15 @@ var ml = {
       var w6 = ml.hypothesis[6];
 
       var vEst = ml.evaluateBoard(history[i])
-      x1 = trainingExamples[i][0][0]
-      x2 = trainingExamples[i][0][1]
-      x3 = trainingExamples[i][0][2]
-      x4 = trainingExamples[i][0][3]
-      x5 = trainingExamples[i][0][4]
-      x6 = trainingExamples[i][0][5]
-      vTrain = trainingExamples[i][1]            
-
+      var x1 = trainingExamples[i][0][0]
+      var x2 = trainingExamples[i][0][1]
+      var x3 = trainingExamples[i][0][2]
+      var x4 = trainingExamples[i][0][3]
+      var x5 = trainingExamples[i][0][4]
+      var x6 = trainingExamples[i][0][5]
+      var vTrain = trainingExamples[i][1]            
+      console.log("i "+i+" vTrain "+vTrain);
+      console.log("vEst "+vEst);
       w0 = w0 + ml.updateConstant*(vTrain - vEst)
       w1 = w1 + ml.updateConstant*(vTrain - vEst)*x1
       w2 = w2 + ml.updateConstant*(vTrain - vEst)*x2
@@ -236,6 +241,7 @@ var ml = {
       ml.hypothesis[4] = w4;
       ml.hypothesis[5] = w5;
       ml.hypothesis[6] = w6;
+      console.log(ml.hypothesis);
     }
   }
 };
@@ -247,7 +253,7 @@ var board = {
   'end': false,
   'start': false,
   'play': [],
-  'delay':20,
+  'delay':50,
   'currPlayer': 'x',
   'selectedPlayer': null,
   'x': {
@@ -260,7 +266,7 @@ var board = {
     size: 100,
     color: "DeepSkyBlue"
   },
-  "ml_loop": 100,
+  "ml_loop": 50,
   'type': 1, // 1 common, 2 machine learning training, 3 ml competing
   "botai": 1, // 1-random, 2- heuristic
   "winner":"",
@@ -314,6 +320,7 @@ var board = {
       board.botai = parseInt(query_string.botai); 
     }
 
+    board.delCookie('history');
 
 
   	// init player
@@ -444,6 +451,7 @@ var board = {
   },
   // use cookie record board history
   recordHistory:function() {
+    console.log('recordHistory');
     var boardStatus = board.getStatus();
     boardStatus = boardStatus.join('');
     var history = board.getCookie("history");
@@ -499,6 +507,12 @@ var board = {
 　  exdate.setDate(exdate.getDate() + expiredays);
 　　document.cookie=c_name+ "=" + escape(value) + ((expiredays==null) ? "" : ";expires="+exdate.toGMTString());
 　},
+  delCookie: function(name) {
+    var exp = new Date();
+    exp.setTime(exp.getTime() - 1);
+    var cval= board.getCookie(name);
+    if(cval!=null) document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+  },
   getSuccessorsX: function() {
     var status = board.getStatus();
     var successor = new Array();
@@ -617,15 +631,22 @@ function checkEndCondition() {
 
   if(board.end) {
   	clearInterval(board.interval);
-    if(3 == board.type && board.ml_loop >1) // if machine learning && still got loop number
+    if(2 == board.type && board.ml_loop
+     >=1) // if machine learning && still got loop number
     {
       board.ml_loop--;
       reset();
-      board.interval = setInterval("action()", board.delay);
+      board.player = chooseYourRole();
 
       // machine training
-      ml.updateWeights(board.getHistory(),ml.getTrainingExamples(board.getHistory()));
+      var trainingExamples = ml.getTrainingExamples(board.getHistory());
+      console.log(trainingExamples);
+      ml.updateWeights(board.getHistory(), trainingExamples);
       board.setCookie("hypothesis",ml.hypothesis,30);
+      board.delCookie('history');
+
+      // if(1!=board.ml_loop)
+      board.interval = setInterval("action()", board.delay);
     }
   }
   return board.end;
@@ -711,6 +732,7 @@ function reset() {
   board.winner = "";
   board.start = false;
   board.selectedPlayer = null;
+  // chooseYourRole();
 }
 
 function drawBoard(stage) {
@@ -812,7 +834,8 @@ function action() {
 
         if(board.currPlayer == board.selectedPlayer)
         {
-          yourAI();
+          machineAI();
+          // yourAI();
         }else {
           board.botTurn(oppositPlayer(board.selectedPlayer))
         }
