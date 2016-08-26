@@ -388,24 +388,30 @@ var board = {
   },
   // 1 'x', 2 'o', 3 (tie)
   addData:function(status) {
+    var xNum = parseInt(document.getElementsByClassName("xwin")[0].innerHTML);
+    var oNum = parseInt(document.getElementsByClassName("owin")[0].innerHTML);
+    var tieNum = parseInt(document.getElementsByClassName("tie")[0].innerHTML);
+
+
     switch(status) {
       case 1:
-        var current = parseInt(document.getElementsByClassName("xwin")[0].innerHTML);
-        current++;
-        document.getElementsByClassName("xwin")[0].innerHTML = current;
+        xNum++;
       break;
       case 2:
-        var current = parseInt(document.getElementsByClassName("owin")[0].innerHTML);
-        current++;
-        document.getElementsByClassName("owin")[0].innerHTML = current;
+        oNum++;
       break;
       case 3:
-        var current = parseInt(document.getElementsByClassName("tie")[0].innerHTML);
-        current++;
-        document.getElementsByClassName("tie")[0].innerHTML = current;
+        tieNum++;
       break;
     }
+    document.getElementsByClassName("xwin")[0].innerHTML = xNum;
+    document.getElementsByClassName("owin")[0].innerHTML = oNum;
+    document.getElementsByClassName("tie")[0].innerHTML = tieNum;
+    var number = (xNum + oNum + tieNum) ? (xNum + oNum + tieNum) : 1;
+    document.getElementsByClassName("xratio")[0].innerHTML = parseInt((xNum / number)*100);
+    document.getElementsByClassName("oratio")[0].innerHTML = parseInt((oNum / number)*100);
   },
+
   botTurn: function() {
     var player = oppositPlayer(board.selectedPlayer);
     if(player==board.currPlayer) {
@@ -631,8 +637,8 @@ function checkEndCondition() {
 
   if(board.end) {
   	clearInterval(board.interval);
-    if(2 == board.type && board.ml_loop
-     >=1) // if machine learning && still got loop number
+    // if(2 == board.type && board.ml_loop>=1) // if machine learning && still got loop number
+    if(board.ml_loop>=1) // if machine learning && still got loop number
     {
       board.ml_loop--;
       reset();
